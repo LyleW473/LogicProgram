@@ -16,12 +16,15 @@ class Solver:
     # Public method that users should use to check if a query is satisfied
     """
     - Used to verify that the input is correct on the very first resolve_query call
+    - For inputs like ["ABC", "DEF", "GHJ"], this will be read as "(A # B # C), (D # E # F), (G # H # J) |- ?" (Where # can represent a conjunction or disjunction at any time)
+    - For inputs like "pqr", this will be read as "P, Q, R |- ?"
+    - 
     """
     def resolve_query(self, clause:list) -> bool:
         is_matching = self.verify_type(input = clause, expected_type = list)
         if is_matching == False:   
             # Convert string into list of strings if possible
-            if self.verify_type(input = clause, expected_type = str) == True: # Transforms e.g,, "pqr" = [p, q, r]
+            if self.verify_type(input = clause, expected_type = str) == True: # Transforms e.g., "pqr" = [p, q, r]
                 clause = [char for char in clause]
             else:
                 raise TypeError("The 'clause' should be a list of strings")
