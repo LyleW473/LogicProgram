@@ -19,6 +19,9 @@ if __name__ == "__main__":
     solver.resolve_query("ABC")
     solver.resolve_query(["ABC"])
     solver.resolve_query(["ABC", "DEF", "GHI"])
+    solver.resolve_query(["A", "B", "C"])
+    solver.resolve_query(["AB", "B", "C"])
+    solver.resolve_query(["A"])
 
     # 2
     # solver.add_formula(tail = "", head = "P")

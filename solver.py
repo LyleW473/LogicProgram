@@ -16,43 +16,65 @@ class Solver:
     # Public method that users should use to check if a query is satisfied
     """
     - Used to verify that the input is correct on the very first resolve_query call
-    - For inputs like ["ABC", "DEF", "GHJ"], this will be read as "(A # B # C), (D # E # F), (G # H # J) |- ?" (Where # can represent a conjunction or disjunction at any time)
-    - For inputs like "pqr", this will be read as "P, Q, R |- ?"
-    - 
+    - For inputs like ["ABC", "DEF", "GHJ"], this will interpreted in the following (Premises must be a conjunctive antecedent):
+        - (A ∧ B ∧ C) |- ? 
+        - (D ∧ E ∧ F) |- ?
+        - (G ∧ H ∧ I) |- ?
+    - For inputs like "pqr", this will be read as "P, Q, R |- ?" (i.e., "? -> (P ∧ Q ∧ R)")
     """
-    def resolve_query(self, clause:list) -> bool:
-        is_matching = self.verify_type(input = clause, expected_type = list)
+    def resolve_query(self, query:list) -> bool:
+        print(f"Solving query: {query}")
+        is_matching = self.verify_type(input = query, expected_type = list)
         if is_matching == False:   
             # Convert string into list of strings if possible
-            if self.verify_type(input = clause, expected_type = str) == True: # Transforms e.g., "pqr" = [p, q, r]
-                clause = [char for char in clause]
+            if self.verify_type(input = query, expected_type = str) == True: # Transforms e.g., "pqr" = [p, q, r]
+                query = [[char for char in query]]
             else:
-                raise TypeError("The 'clause' should be a list of strings")
+                raise TypeError("The 'query' should be a list of strings")
+            
+        else: 
+            """
+            ["abc", "def", "ghi"] converted to [["a", "b", "c"], ["d", "e", "f"]. ["g", "h", "i"]]
 
-        # Continue to resolve the query
-        satisfied = self.__resolve_query(clause)
-        # print(satisfied, clause , "here")
-        print(f"{clause} follows" if satisfied else f"{clause} does not follow")
+            This will be treated as 3 separate queries passed to the solver i.e:
+            - ?A, B, C  (Which is equivalent to (A ∧ B ∧ C))
+            - ?D, E, F
+            - ?G, H, I
+            """
+            query =  [[char for char in query] for query in query]
+        
+        # For each query
+        for q in query:
+            # Resolve the query
+            satisfied = self.__resolve_query(q)
 
+            # Create a more readable representation of the query
+            if len(q) == 1:
+                readable_query = q[0]
+            else:
+                readable_query = "({})".format(' ∧ '.join(q))
+            
+            print(f"{readable_query} follows" if satisfied else f"{readable_query} does not follow")
+        print("\n")
 
     # Private method for resolving queries
     """
     - The method takes in a query and see if it follows logically from the data contained in the logic program (resolution)
     """
-    def __resolve_query(self, clause:list) -> bool:
+    def __resolve_query(self, query:list) -> bool:
         
-        # If the clause is empty, then the initial query was satisfied
+        # If the query is empty, then the initial query was satisfied
         
-        if clause[0] == "":
+        if query[0] == "":
             return True
         
         # Check if 
-        query = clause[0]
+        current_query = query[0]
         for formula in self.formulas:
-            # print(formula, formula.tail, formula.head, query)
-            if formula.head == query:
-                new_query = [formula.tail] + clause[1:] # Construct new query
-                # print("new query", new_query)
+
+            if formula.head == current_query:
+                # Construct new query, replacing the first literal (i.e., current_query) with the tail of the formula
+                new_query = [formula.tail] + query[1:]
                 if self.__resolve_query(new_query) == True:
                     return True
         
