@@ -12,6 +12,7 @@ if __name__ == "__main__":
     solver.add_formula(tail = "", head = "ABC")
     solver.add_formula(tail = "", head = "DEF")
     solver.add_formula(tail = "A", head = "GHI")
+    solver.add_formula(tail = "", head = "AB")
     
     solver.resolve_query("P")
     solver.resolve_query("T")
@@ -20,8 +21,8 @@ if __name__ == "__main__":
     solver.resolve_query(["ABC"])
     solver.resolve_query(["ABC", "DEF", "GHI"])
     solver.resolve_query(["A", "B", "C"])
-    solver.resolve_query(["AB", "B", "C"])
     solver.resolve_query(["A"])
+    solver.resolve_query(["AB", "B", "C"])
 
     # 2
     # solver.add_formula(tail = "", head = "P")

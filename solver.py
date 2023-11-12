@@ -34,14 +34,14 @@ class Solver:
             
         else: 
             """
-            ["abc", "def", "ghi"] converted to [["a", "b", "c"], ["d", "e", "f"]. ["g", "h", "i"]]
+            ["abc", "def", "ghi"] converted to [["abc"], ["def"], ["ghi"]]
 
             This will be treated as 3 separate queries passed to the solver i.e:
             - ?A, B, C  (Which is equivalent to (A ∧ B ∧ C))
             - ?D, E, F
             - ?G, H, I
             """
-            query =  [[char for char in query] for query in query]
+            query = [[q] for q in query]
         
         # For each query
         for q in query:
@@ -49,10 +49,11 @@ class Solver:
             satisfied = self.__resolve_query(q)
 
             # Create a more readable representation of the query
-            if len(q) == 1:
-                readable_query = q[0]
+            formula = q[0] # As q is currently e.g., ["ab"] or ["a"]
+            if len(formula) == 1:
+                readable_query = formula[0]
             else:
-                readable_query = "({})".format(' ∧ '.join(q))
+                readable_query = "({})".format(' ∧ '.join(formula))
             
             print(f"{readable_query} follows" if satisfied else f"{readable_query} does not follow")
         print("\n")
@@ -64,16 +65,15 @@ class Solver:
     def __resolve_query(self, query:list) -> bool:
         
         # If the query is empty, then the initial query was satisfied
-        
         if query[0] == "":
             return True
         
-        # Check if 
+        # Check the current query against all of the formulas in the solver
         current_query = query[0]
         for formula in self.formulas:
-
+            # Found a formula such that formula.tail -> current_query
             if formula.head == current_query:
-                # Construct new query, replacing the first literal (i.e., current_query) with the tail of the formula
+                # Construct new query, replacing the current query with the tail of the formula
                 new_query = [formula.tail] + query[1:]
                 if self.__resolve_query(new_query) == True:
                     return True
