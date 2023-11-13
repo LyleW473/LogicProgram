@@ -9,10 +9,15 @@ if __name__ == "__main__":
     solver.add_formula(tail = "A", head = "Q")
     solver.add_formula(tail = "B", head = "Q")
     solver.add_formula(tail = "C", head = "Q")
-    solver.add_formula(tail = "", head = "ABC")
-    solver.add_formula(tail = "", head = "DEF")
-    solver.add_formula(tail = "A", head = "GHI")
-    solver.add_formula(tail = "", head = "AB")
+
+    solver.add_formula(tail = "AB", head = "R")
+    solver.add_formula(tail = "CD", head = "A")
+    solver.add_formula(tail = ["C", "D", "E", "F"], head = "P")
+    solver.add_formula(tail = "GHIJ", head = "Z")
+
+    # The following formulas should cause errors
+    ## solver.add_formula(tail = ["CD", "D", "E", "F"], head = "A")
+    ## solver.add_formula(tail = "", head = "AB")
     
     solver.resolve_query("P")
     solver.resolve_query("T")
