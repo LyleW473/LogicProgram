@@ -22,7 +22,7 @@ class Solver:
         - (G ∧ H ∧ I) |- ?
     - For inputs like "pqr" or ["pqr"], this will be read as "P, Q, R |- ?" (i.e., "? -> (P ∧ Q ∧ R)")
     """
-    def resolve_query(self, query:list) -> bool:
+    def resolve_query(self, query:list, depth_limit: int) -> bool:
         print(f"Solving query: {query}")
         is_matching = self.verify_type(input = query, expected_type = list)
         if is_matching == False:   
@@ -48,7 +48,7 @@ class Solver:
         # For each query
         for q in queries:
             # Resolve the query
-            satisfied = self.__resolve_query(q)
+            satisfied = self.__resolve_query(query = q, current_depth = 0, depth_limit = depth_limit)
 
             # Create a more readable representation of the query
             if len(q) == 1:
@@ -63,11 +63,16 @@ class Solver:
     """
     - The method takes in a query and see if it follows logically from the data contained in the logic program (resolution)
     """
-    def __resolve_query(self, query:list) -> bool:
+    def __resolve_query(self, query:list, current_depth: int, depth_limit: int) -> bool:
         
         # If the query is empty, then the initial query was satisfied
         if not query:
             return True
+        
+        # Avoid maximum recursion depth (large computations)
+        if current_depth > depth_limit:
+            print("Exited call due to exceeding depth limit")
+            return False
         
         # Check the current query against all of the formulas in the solver
         current_query = query[0]
@@ -76,7 +81,7 @@ class Solver:
             if formula.head == current_query:
                 # Construct new query, replacing the current query with the tail of the formula
                 new_query = formula.tail + query[1:]
-                if self.__resolve_query(new_query) == True:
+                if self.__resolve_query(new_query, current_depth = current_depth + 1, depth_limit = depth_limit) == True:
                     return True
         
         return False
